@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.8
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wallhaven.Client", "Wallhaven.Client\Wallhaven.Client.csproj", "{CE731CDA-96B4-4391-8B5F-A7798A9418B1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wallhaven.Client.Tests", "Wallhaven.Client.Tests\Wallhaven.Client.Tests.csproj", "{8052A7F3-CFEE-428F-864D-2A8F63D05955}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CE731CDA-96B4-4391-8B5F-A7798A9418B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE731CDA-96B4-4391-8B5F-A7798A9418B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE731CDA-96B4-4391-8B5F-A7798A9418B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE731CDA-96B4-4391-8B5F-A7798A9418B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8052A7F3-CFEE-428F-864D-2A8F63D05955}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8052A7F3-CFEE-428F-864D-2A8F63D05955}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8052A7F3-CFEE-428F-864D-2A8F63D05955}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8052A7F3-CFEE-428F-864D-2A8F63D05955}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CB6B1993-000C-4CEF-80B3-C6673073326A}
+	EndGlobalSection
+EndGlobal
