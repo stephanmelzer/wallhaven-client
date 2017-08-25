@@ -2,7 +2,7 @@
 {
     public class Order
     {
-        public static string Ascending = "asc";
-        public static string Descending = "desc";
+        public const string Ascending = "asc";
+        public const string Descending = "desc";
     }
 }

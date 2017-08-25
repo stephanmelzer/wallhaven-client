@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Management.Automation" Version="6.1.7601.17515" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Wallhaven.Client\Wallhaven.Client.csproj" />
+  </ItemGroup>
+
+</Project>

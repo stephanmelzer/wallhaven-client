@@ -2,10 +2,10 @@
 {
     public class Sorting
     {
-        public static string Relevance = "relevance";
-        public static string Random = "random";
-        public static string DateAdded = "date_added";
-        public static string Views = "views";
-        public static string Favorites = "favorites";
+        public const string Relevance = "relevance";
+        public const string Random = "random";
+        public const string DateAdded = "date_added";
+        public const string Views = "views";
+        public const string Favorites = "favorites";
     }
 }
