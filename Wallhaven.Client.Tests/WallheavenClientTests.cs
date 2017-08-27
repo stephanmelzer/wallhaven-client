@@ -26,7 +26,7 @@ namespace Wallhaven.Client.Tests
         [Test]
         public void GetLatest_NoPageNumber_ReturnsTheImagesOfFirstPage()
         {
-            var webClient = CreateWebClientMock();
+            var webClient = CreateWebClientFactoryMock();
             var client = new WallheavenClient(webClient.Object);
 
             List<WallpaperInfo> latestWallpapers = client.GetLatest();
@@ -38,7 +38,7 @@ namespace Wallhaven.Client.Tests
         [Test]
         public void GetLatest_NoPageNumber_CallsUrlWithoutPageNumber()
         {
-            var webClient = CreateWebClientMock(new Uri("https://alpha.wallhaven.cc/latest"));
+            var webClient = CreateWebClientFactoryMock(new Uri("https://alpha.wallhaven.cc/latest"));
             var client = new WallheavenClient(webClient.Object);
             client.GetLatest();
 
@@ -50,7 +50,7 @@ namespace Wallhaven.Client.Tests
         [TestCase(3)]
         public void GetLatest_PageNumber_CallsUrlWithPageNumber(int pageNumber)
         {
-            var webClient = CreateWebClientMock(new Uri($"https://alpha.wallhaven.cc/latest?page={pageNumber}"));
+            var webClient = CreateWebClientFactoryMock(new Uri($"https://alpha.wallhaven.cc/latest?page={pageNumber}"));
             var client = new WallheavenClient(webClient.Object);
             client.GetLatest(pageNumber);
 
@@ -60,7 +60,7 @@ namespace Wallhaven.Client.Tests
         [Test]
         public void GetRandom_NoPageNumber_ReturnsTheImagesOfFirstPage()
         {
-            var webClient = CreateWebClientMock();
+            var webClient = CreateWebClientFactoryMock();
             var client = new WallheavenClient(webClient.Object);
 
             List<WallpaperInfo> latestWallpapers = client.GetRandom();
@@ -72,7 +72,7 @@ namespace Wallhaven.Client.Tests
         [Test]
         public void GetRandom_NoPageNumber_CallsUrlWithoutPageNumber()
         {
-            var webClient = CreateWebClientMock(new Uri("https://alpha.wallhaven.cc/random"));
+            var webClient = CreateWebClientFactoryMock(new Uri("https://alpha.wallhaven.cc/random"));
             var client = new WallheavenClient(webClient.Object);
 
             client.GetRandom();
@@ -85,7 +85,7 @@ namespace Wallhaven.Client.Tests
         [TestCase(3)]
         public void GetRandom_NoPageNumber_CallsUrlWithPageNumber(int pageNumber)
         {
-            var webClient = CreateWebClientMock(new Uri($"https://alpha.wallhaven.cc/random?page={pageNumber}"));
+            var webClient = CreateWebClientFactoryMock(new Uri($"https://alpha.wallhaven.cc/random?page={pageNumber}"));
             var client = new WallheavenClient(webClient.Object);
 
             client.GetRandom(pageNumber);
@@ -96,7 +96,7 @@ namespace Wallhaven.Client.Tests
         [Test]
         public void Search_SearchParams_ReturnsWallpaperInfos()
         {
-            var webClient = CreateWebClientMock();
+            var webClient = CreateWebClientFactoryMock();
             var wallhavenClient = new WallheavenClient(webClient.Object);
             var searchParam = new SearchParameter
             {
@@ -119,7 +119,7 @@ namespace Wallhaven.Client.Tests
                 Page = 2,
                 Sorting = Sorting.Views
             };
-            var webClient = CreateWebClientMock(new Uri($"https://alpha.wallhaven.cc/search?page={searchParam.Page}&sorting={searchParam.Sorting}"));
+            var webClient = CreateWebClientFactoryMock(new Uri($"https://alpha.wallhaven.cc/search?page={searchParam.Page}&sorting={searchParam.Sorting}"));
             var wallhavenClient = new WallheavenClient(webClient.Object);
 
             wallhavenClient.Search(searchParam);
@@ -136,7 +136,7 @@ namespace Wallhaven.Client.Tests
             {
                 Page = pageNumber
             };
-            var webClient = CreateWebClientMock(new Uri("https://alpha.wallhaven.cc/search?page=1"));
+            var webClient = CreateWebClientFactoryMock(new Uri("https://alpha.wallhaven.cc/search?page=1"));
             var wallhavenClient = new WallheavenClient(webClient.Object);
 
             wallhavenClient.Search(searchParam);
@@ -159,7 +159,7 @@ namespace Wallhaven.Client.Tests
             }
         }
 
-        private Mock<IWebClient> CreateWebClientMock(Uri wallpaperListPageUri = null)
+        private Mock<IWebClientFactory> CreateWebClientFactoryMock(Uri wallpaperListPageUri = null)
         {
             var wallpaperListPageData = _resourceFile[WallpaperListPage];
             var wallpaperDetailPageData = _resourceFile[WallpaperDetailPage];
@@ -176,7 +176,10 @@ namespace Wallhaven.Client.Tests
             webClientMock.Setup(webClient => webClient.DownloadString(It.Is<Uri>(uri => uri.AbsolutePath.Contains("/wallpaper"))))
                          .Returns(wallpaperDetailPageData);
 
-            return webClientMock;
+            var webClientFactoryMock = new Mock<IWebClientFactory>();
+            webClientFactoryMock.Setup(factory => factory.CreateWebClient()).Returns(webClientMock.Object);
+
+            return webClientFactoryMock;
         }
 
         private bool IsValidWallpaperInfo(WallpaperInfo wallpaperInfo)

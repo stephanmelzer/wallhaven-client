@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using AngleSharp.Dom;
 using AngleSharp.Parser.Html;
 using Wallhaven.Client.Net;
@@ -13,12 +14,12 @@ namespace Wallhaven.Client
     public class WallheavenClient
     {
         private readonly Uri _baseUrl = new Uri("https://alpha.wallhaven.cc");
-        private IWebClient _webClient;
+        private IWebClientFactory _webClientFactory;
         private HtmlParser _htmlParser;
 
-        public WallheavenClient(IWebClient webClient)
+        public WallheavenClient(IWebClientFactory webClientFactorybClient)
         {
-            _webClient = webClient;
+            _webClientFactory = webClientFactorybClient;
             _htmlParser = new HtmlParser();
         }
 
@@ -52,7 +53,8 @@ namespace Wallhaven.Client
 
         private List<WallpaperInfo> GetWallpaperInfosFromPage(Uri uri)
         {
-            var result = _webClient.DownloadString(uri);
+            var webClient = _webClientFactory.CreateWebClient();
+            var result = webClient.DownloadString(uri);
 
             var dom = _htmlParser.Parse(result);
             var figureElements = dom.QuerySelectorAll("figure");
@@ -64,14 +66,15 @@ namespace Wallhaven.Client
 
         private void AddSourceUri(List<WallpaperInfo> wallpaperInfos)
         {
-            foreach (var wallpaperInfo in wallpaperInfos)
+            Parallel.ForEach(wallpaperInfos, wallpaperInfo =>
             {
-                var result = _webClient.DownloadString(new Uri(_baseUrl, $"wallpaper/{wallpaperInfo.Id}"));
+                var webClient = _webClientFactory.CreateWebClient();
+                var result = webClient.DownloadString(new Uri(_baseUrl, $"wallpaper/{wallpaperInfo.Id}"));
                 var dom = _htmlParser.Parse(result);
                 var wallpaperElement = dom.QuerySelector("#wallpaper");
                 wallpaperInfo.Source = new Uri(wallpaperElement.GetAttribute("src"));
                 wallpaperInfo.FileName = wallpaperInfo.Source.Segments.LastOrDefault();
-            }
+            });
         }
 
         private List<WallpaperInfo> CreateWallpaperInfoFromPage(IHtmlCollection<IElement> elements)

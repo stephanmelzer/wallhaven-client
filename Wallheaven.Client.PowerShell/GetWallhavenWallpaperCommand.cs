@@ -58,7 +58,7 @@ namespace Wallheaven.Client.PowerShell
 
         protected override void ProcessRecord()
         {
-            var wallheavenClient = new WallheavenClient(new WebClient());
+            var wallheavenClient = new WallheavenClient(new WebClientFactory());
             List<WallpaperInfo> wallpaperInfos = new List<WallpaperInfo>();
 
             if (Latest.IsPresent)
