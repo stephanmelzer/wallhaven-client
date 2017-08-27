@@ -205,8 +205,12 @@ namespace Wallhaven.Client.Tests
 
             isValid &= wallpaperInfo.Id > 0;
             isValid &= !String.IsNullOrWhiteSpace(wallpaperInfo.Resolution);
-            isValid &= wallpaperInfo.Thumbnail != null && !String.IsNullOrWhiteSpace(wallpaperInfo.Thumbnail.ToString());
-            isValid &= wallpaperInfo.Source != null && !String.IsNullOrWhiteSpace(wallpaperInfo.Source.ToString());
+            isValid &= wallpaperInfo.Thumbnail != null &&
+                       !String.IsNullOrWhiteSpace(wallpaperInfo.Thumbnail.ToString()) &&
+                       wallpaperInfo.Thumbnail.Scheme.StartsWith("http");
+            isValid &= wallpaperInfo.Source != null &&
+                       !String.IsNullOrWhiteSpace(wallpaperInfo.Source.ToString()) &&
+                       wallpaperInfo.Source.Scheme.StartsWith("http");
             isValid &= !String.IsNullOrWhiteSpace(wallpaperInfo.FileName);
 
             if (wallpaperInfo.Source != null && wallpaperInfo.FileName != null)

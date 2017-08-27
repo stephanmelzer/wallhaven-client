@@ -72,7 +72,7 @@ namespace Wallhaven.Client
                 var result = webClient.DownloadString(new Uri(_baseUrl, $"wallpaper/{wallpaperInfo.Id}"));
                 var dom = _htmlParser.Parse(result);
                 var wallpaperElement = dom.QuerySelector("#wallpaper");
-                wallpaperInfo.Source = new Uri(wallpaperElement.GetAttribute("src"));
+                wallpaperInfo.Source = new Uri(_baseUrl, wallpaperElement.GetAttribute("src"));
                 wallpaperInfo.FileName = wallpaperInfo.Source.Segments.LastOrDefault();
             });
         }
