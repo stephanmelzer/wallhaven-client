@@ -115,19 +115,5 @@ namespace Wallheaven.Client.PowerShell
             WriteDebug($"Converted purity value: {purityValue}");
             return new Purity(purityValue);
         }
-
-        //private R GetEnumValue<T, R>(List<string> enumValueNames)
-        //{
-        //    if (enumValueNames == null || !enumValueNames.Any()) return default(R);
-
-        //    T purityValue = (T)0;
-        //    foreach (string purityName in Purity)
-        //    {
-        //        purityValue |= (T)Enum.Parse(typeof(T), purityName);
-        //    }
-
-        //    WriteDebug($"Converted purity value: {purityValue}");
-        //    return new R(purityValue);
-        //}
     }
 }
