@@ -142,6 +142,25 @@ namespace Wallhaven.Client.Tests
             webClient.VerifyAll();
         }
 
+        [Test]
+        [TestCase(null)]
+        [TestCase(0)]
+        public void Search_SearchParamsWithIllegalPageNumber_CallsSearchUrlWithPageNumberOne(int? pageNumber)
+        {
+            var searchParam = new SearchParameter
+            {
+                Page = pageNumber
+            };
+
+            var webClient = new Mock<IWebClient>();
+            webClient.Setup(client => client.DownloadString(new Uri($"https://alpha.wallhaven.cc/search?page=1")));
+            var wallhavenClient = new WallheavenClient(webClient.Object);
+
+            wallhavenClient.Search(searchParam);
+
+            webClient.VerifyAll();
+        }
+
         private bool IsValidWallpaperInfo(WallpaperInfo wallpaperInfo)
         {
             var isValid = true;

@@ -40,6 +40,8 @@ namespace Wallhaven.Client
 
         public List<WallpaperInfo> Search(SearchParameter searchParam)
         {
+            if (!searchParam.Page.HasValue || searchParam.Page == 0) searchParam.Page = 1;
+
             var searchUri = new Uri(_baseUrl, "search" + searchParam.ToQueryString());
             var wallpaperInfos = GetWallpaperInfosFromPage(searchUri);
 
@@ -72,7 +74,11 @@ namespace Wallhaven.Client
                 Thumbnail = new Uri(element.QuerySelector(">img").GetAttribute("data-src"))
             };
 
-            wallpaperInfo.Source = new Uri(String.Format("https://wallpapers.wallhaven.cc/wallpapers/full/wallhaven-{0}.jpg", wallpaperInfo.Id));
+            // TODO: Add extra property for filename.
+            // TODO: Add test for different file types. There are probably more than jpg.
+            wallpaperInfo.Source =
+                new Uri(String.Format("https://wallpapers.wallhaven.cc/wallpapers/full/wallhaven-{0}.jpg",
+                    wallpaperInfo.Id));
 
             return wallpaperInfo;
         }
