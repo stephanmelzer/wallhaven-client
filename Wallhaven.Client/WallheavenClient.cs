@@ -43,7 +43,7 @@ namespace Wallhaven.Client
 
         public List<WallpaperInfo> Search(SearchParameter searchParam)
         {
-            if (!searchParam.Page.HasValue || searchParam.Page == 0) searchParam.Page = 1;
+            if (!searchParam.Page.HasValue || searchParam.Page <= 0) searchParam.Page = 1;
 
             var searchUri = new Uri(_baseUrl, "search" + searchParam.ToQueryString());
             var wallpaperInfos = GetWallpaperInfosFromPage(searchUri);
