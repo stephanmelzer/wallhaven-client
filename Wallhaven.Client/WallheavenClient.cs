@@ -14,10 +14,12 @@ namespace Wallhaven.Client
     {
         private readonly Uri _baseUrl = new Uri("https://alpha.wallhaven.cc");
         private IWebClient _webClient;
+        private HtmlParser _htmlParser;
 
         public WallheavenClient(IWebClient webClient)
         {
             _webClient = webClient;
+            _htmlParser = new HtmlParser();
         }
 
         public List<WallpaperInfo> GetLatest(int pageNumber = 1)
@@ -52,20 +54,32 @@ namespace Wallhaven.Client
         {
             var result = _webClient.DownloadString(uri);
 
-            var htmlParser = new HtmlParser();
-            var dom = htmlParser.Parse(result);
+            var dom = _htmlParser.Parse(result);
             var figureElements = dom.QuerySelectorAll("figure");
-            var wallpaperInfos = CreateWallpaperInfo(figureElements);
+            var wallpaperInfos = CreateWallpaperInfoFromPage(figureElements);
+            AddSourceUri(wallpaperInfos);
 
             return wallpaperInfos;
         }
 
-        private List<WallpaperInfo> CreateWallpaperInfo(IHtmlCollection<IElement> elements)
+        private void AddSourceUri(List<WallpaperInfo> wallpaperInfos)
         {
-            return elements.Select(CreateWallpaperInfo).ToList();
+            foreach (var wallpaperInfo in wallpaperInfos)
+            {
+                var result = _webClient.DownloadString(new Uri(_baseUrl, $"wallpaper/{wallpaperInfo.Id}"));
+                var dom = _htmlParser.Parse(result);
+                var wallpaperElement = dom.QuerySelector("#wallpaper");
+                wallpaperInfo.Source = new Uri(wallpaperElement.GetAttribute("src"));
+                wallpaperInfo.FileName = wallpaperInfo.Source.Segments.LastOrDefault();
+            }
         }
 
-        private WallpaperInfo CreateWallpaperInfo(IElement element)
+        private List<WallpaperInfo> CreateWallpaperInfoFromPage(IHtmlCollection<IElement> elements)
+        {
+            return elements.Select(CreateWallpaperInfoFromPage).ToList();
+        }
+
+        private WallpaperInfo CreateWallpaperInfoFromPage(IElement element)
         {
             var wallpaperInfo = new WallpaperInfo
             {
@@ -73,12 +87,6 @@ namespace Wallhaven.Client
                 Resolution = element.QuerySelector(".wall-res").TextContent,
                 Thumbnail = new Uri(element.QuerySelector(">img").GetAttribute("data-src"))
             };
-
-            // TODO: Add extra property for filename.
-            // TODO: Add test for different file types. There are probably more than jpg.
-            wallpaperInfo.Source =
-                new Uri(String.Format("https://wallpapers.wallhaven.cc/wallpapers/full/wallhaven-{0}.jpg",
-                    wallpaperInfo.Id));
 
             return wallpaperInfo;
         }

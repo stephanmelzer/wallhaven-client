@@ -10,11 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="TestData\PageData.html" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="TestData\PageData.html" />
+    <EmbeddedResource Include="TestData\WallpaperListPage.html" />
+    <EmbeddedResource Include="TestData\WallpaperDetailPage.html" />
   </ItemGroup>
 
   <ItemGroup>

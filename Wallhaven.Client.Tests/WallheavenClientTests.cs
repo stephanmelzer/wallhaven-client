@@ -13,17 +13,20 @@ namespace Wallhaven.Client.Tests
     [TestFixture]
     public class WallheavenClientTests
     {
+        private Dictionary<string, string> _resourceFile = new Dictionary<string, string>();
+        private const string WallpaperListPage = "Wallhaven.Client.Tests.TestData.WallpaperListPage.html";
+        private const string WallpaperDetailPage = "Wallhaven.Client.Tests.TestData.WallpaperDetailPage.html";
+
+        [OneTimeSetUp]
+        public void Init()
+        {
+            LoadTestData();
+        }
+
         [Test]
         public void GetLatest_NoPageNumber_ReturnsTheImagesOfFirstPage()
         {
-            var assembly = Assembly.GetExecutingAssembly();
-            var stream = assembly.GetManifestResourceStream("Wallhaven.Client.Tests.TestData.PageData.html");
-            StreamReader reader = new StreamReader(stream);
-            var testPageData = reader.ReadToEnd();
-
-            var webClient = new Mock<IWebClient>();
-            webClient.Setup(x => x.DownloadString(It.IsAny<Uri>())).Returns(testPageData);
-
+            var webClient = CreateWebClientMock();
             var client = new WallheavenClient(webClient.Object);
 
             List<WallpaperInfo> latestWallpapers = client.GetLatest();
@@ -35,8 +38,7 @@ namespace Wallhaven.Client.Tests
         [Test]
         public void GetLatest_NoPageNumber_CallsUrlWithoutPageNumber()
         {
-            var webClient = new Mock<IWebClient>();
-            webClient.Setup(x => x.DownloadString(new Uri("https://alpha.wallhaven.cc/latest")));
+            var webClient = CreateWebClientMock(new Uri("https://alpha.wallhaven.cc/latest"));
             var client = new WallheavenClient(webClient.Object);
             client.GetLatest();
 
@@ -48,8 +50,7 @@ namespace Wallhaven.Client.Tests
         [TestCase(3)]
         public void GetLatest_PageNumber_CallsUrlWithPageNumber(int pageNumber)
         {
-            var webClient = new Mock<IWebClient>();
-            webClient.Setup(x => x.DownloadString(new Uri($"https://alpha.wallhaven.cc/latest?page={pageNumber}")));
+            var webClient = CreateWebClientMock(new Uri($"https://alpha.wallhaven.cc/latest?page={pageNumber}"));
             var client = new WallheavenClient(webClient.Object);
             client.GetLatest(pageNumber);
 
@@ -59,14 +60,7 @@ namespace Wallhaven.Client.Tests
         [Test]
         public void GetRandom_NoPageNumber_ReturnsTheImagesOfFirstPage()
         {
-            var assembly = Assembly.GetExecutingAssembly();
-            var stream = assembly.GetManifestResourceStream("Wallhaven.Client.Tests.TestData.PageData.html");
-            StreamReader reader = new StreamReader(stream);
-            var testPageData = reader.ReadToEnd();
-
-            var webClient = new Mock<IWebClient>();
-            webClient.Setup(x => x.DownloadString(It.IsAny<Uri>())).Returns(testPageData);
-
+            var webClient = CreateWebClientMock();
             var client = new WallheavenClient(webClient.Object);
 
             List<WallpaperInfo> latestWallpapers = client.GetRandom();
@@ -78,9 +72,9 @@ namespace Wallhaven.Client.Tests
         [Test]
         public void GetRandom_NoPageNumber_CallsUrlWithoutPageNumber()
         {
-            var webClient = new Mock<IWebClient>();
-            webClient.Setup(x => x.DownloadString(new Uri("https://alpha.wallhaven.cc/random")));
+            var webClient = CreateWebClientMock(new Uri("https://alpha.wallhaven.cc/random"));
             var client = new WallheavenClient(webClient.Object);
+
             client.GetRandom();
 
             webClient.VerifyAll();
@@ -91,9 +85,9 @@ namespace Wallhaven.Client.Tests
         [TestCase(3)]
         public void GetRandom_NoPageNumber_CallsUrlWithPageNumber(int pageNumber)
         {
-            var webClient = new Mock<IWebClient>();
-            webClient.Setup(x => x.DownloadString(new Uri($"https://alpha.wallhaven.cc/random?page={pageNumber}")));
+            var webClient = CreateWebClientMock(new Uri($"https://alpha.wallhaven.cc/random?page={pageNumber}"));
             var client = new WallheavenClient(webClient.Object);
+
             client.GetRandom(pageNumber);
 
             webClient.VerifyAll();
@@ -102,15 +96,8 @@ namespace Wallhaven.Client.Tests
         [Test]
         public void Search_SearchParams_ReturnsWallpaperInfos()
         {
-            var assembly = Assembly.GetExecutingAssembly();
-            var stream = assembly.GetManifestResourceStream("Wallhaven.Client.Tests.TestData.PageData.html");
-            StreamReader reader = new StreamReader(stream);
-            var testPageData = reader.ReadToEnd();
-
-            var webClient = new Mock<IWebClient>();
-            webClient.Setup(client => client.DownloadString(It.IsAny<Uri>())).Returns(testPageData);
+            var webClient = CreateWebClientMock();
             var wallhavenClient = new WallheavenClient(webClient.Object);
-
             var searchParam = new SearchParameter
             {
                 Sorting = Sorting.Views,
@@ -132,9 +119,7 @@ namespace Wallhaven.Client.Tests
                 Page = 2,
                 Sorting = Sorting.Views
             };
-
-            var webClient = new Mock<IWebClient>();
-            webClient.Setup(client => client.DownloadString(new Uri($"https://alpha.wallhaven.cc/search?page={searchParam.Page}&sorting={searchParam.Sorting}")));
+            var webClient = CreateWebClientMock(new Uri($"https://alpha.wallhaven.cc/search?page={searchParam.Page}&sorting={searchParam.Sorting}"));
             var wallhavenClient = new WallheavenClient(webClient.Object);
 
             wallhavenClient.Search(searchParam);
@@ -151,14 +136,47 @@ namespace Wallhaven.Client.Tests
             {
                 Page = pageNumber
             };
-
-            var webClient = new Mock<IWebClient>();
-            webClient.Setup(client => client.DownloadString(new Uri($"https://alpha.wallhaven.cc/search?page=1")));
+            var webClient = CreateWebClientMock(new Uri("https://alpha.wallhaven.cc/search?page=1"));
             var wallhavenClient = new WallheavenClient(webClient.Object);
 
             wallhavenClient.Search(searchParam);
 
             webClient.VerifyAll();
+        }
+
+        private void LoadTestData()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceNames = assembly.GetManifestResourceNames();
+
+            foreach (string resourceName in resourceNames)
+            {
+                var stream = assembly.GetManifestResourceStream(resourceName);
+                StreamReader reader = new StreamReader(stream);
+                var resourceContent = reader.ReadToEnd();
+
+                _resourceFile.Add(resourceName, resourceContent);
+            }
+        }
+
+        private Mock<IWebClient> CreateWebClientMock(Uri wallpaperListPageUri = null)
+        {
+            var wallpaperListPageData = _resourceFile[WallpaperListPage];
+            var wallpaperDetailPageData = _resourceFile[WallpaperDetailPage];
+
+            var webClientMock = new Mock<IWebClient>();
+            webClientMock.When(() => wallpaperListPageUri == null)
+                         .Setup(webClient => webClient.DownloadString(It.IsAny<Uri>()))
+                         .Returns(wallpaperListPageData);
+
+            webClientMock.When(() => wallpaperListPageUri != null)
+                         .Setup(webClient => webClient.DownloadString(wallpaperListPageUri))
+                         .Returns(wallpaperListPageData);
+
+            webClientMock.Setup(webClient => webClient.DownloadString(It.Is<Uri>(uri => uri.AbsolutePath.Contains("/wallpaper"))))
+                         .Returns(wallpaperDetailPageData);
+
+            return webClientMock;
         }
 
         private bool IsValidWallpaperInfo(WallpaperInfo wallpaperInfo)
@@ -169,6 +187,12 @@ namespace Wallhaven.Client.Tests
             isValid &= !String.IsNullOrWhiteSpace(wallpaperInfo.Resolution);
             isValid &= wallpaperInfo.Thumbnail != null && !String.IsNullOrWhiteSpace(wallpaperInfo.Thumbnail.ToString());
             isValid &= wallpaperInfo.Source != null && !String.IsNullOrWhiteSpace(wallpaperInfo.Source.ToString());
+            isValid &= !String.IsNullOrWhiteSpace(wallpaperInfo.FileName);
+
+            if (wallpaperInfo.Source != null && wallpaperInfo.FileName != null)
+            {
+                isValid &= wallpaperInfo.Source.Segments.LastOrDefault() == wallpaperInfo.FileName;
+            }
 
             return isValid;
         }

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Wallhaven.Client
 {
@@ -10,5 +8,6 @@ namespace Wallhaven.Client
         public string Resolution { get; set; }
         public Uri Thumbnail { get; set; }
         public Uri Source { get; set; }
+        public string FileName { get; set; }
     }
 }
