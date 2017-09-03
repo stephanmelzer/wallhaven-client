@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Management.Automation;
-using Wallhaven.Client;
 using Wallhaven.Client.Net;
 using Wallhaven.Client.Search;
-using System.Linq;
 
-namespace Wallheaven.Client.PowerShell
+namespace Wallhaven.Client.PowerShell
 {
     [Cmdlet(VerbsCommon.Get, "WallhavenWallpaper")]
     public class GetWallhavenWallpaperCommand : Cmdlet
@@ -58,7 +57,7 @@ namespace Wallheaven.Client.PowerShell
 
         protected override void ProcessRecord()
         {
-            var wallheavenClient = new WallheavenClient(new WebClientFactory());
+            var wallheavenClient = new WallhavenClient(new WebClientFactory());
             List<WallpaperInfo> wallpaperInfos = new List<WallpaperInfo>();
 
             if (Latest.IsPresent)

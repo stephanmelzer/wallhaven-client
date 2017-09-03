@@ -11,13 +11,13 @@ using Wallhaven.Client.Search;
 
 namespace Wallhaven.Client
 {
-    public class WallheavenClient
+    public class WallhavenClient
     {
         private readonly Uri _baseUrl = new Uri("https://alpha.wallhaven.cc");
         private IWebClientFactory _webClientFactory;
         private HtmlParser _htmlParser;
 
-        public WallheavenClient(IWebClientFactory webClientFactorybClient)
+        public WallhavenClient(IWebClientFactory webClientFactorybClient)
         {
             _webClientFactory = webClientFactorybClient;
             _htmlParser = new HtmlParser();
