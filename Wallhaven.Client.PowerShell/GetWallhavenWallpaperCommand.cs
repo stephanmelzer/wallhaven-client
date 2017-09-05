@@ -57,6 +57,8 @@ namespace Wallhaven.Client.PowerShell
 
         protected override void ProcessRecord()
         {
+            WriteVerbose("Getting wallpaper...");
+
             var wallheavenClient = new WallhavenClient(new WebClientFactory());
             List<WallpaperInfo> wallpaperInfos = new List<WallpaperInfo>();
 
@@ -81,9 +83,11 @@ namespace Wallhaven.Client.PowerShell
                     Ratios = Ratios,
                     Resolutions = Resolutions
                 };
+
                 wallpaperInfos = wallheavenClient.Search(searchParams);
             }
 
+            WriteVerbose($"Got {wallpaperInfos.Count} wallpaper");
             wallpaperInfos.ForEach(WriteObject);
         }
 
