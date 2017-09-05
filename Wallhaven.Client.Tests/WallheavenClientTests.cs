@@ -26,7 +26,7 @@ namespace Wallhaven.Client.Tests
         [Test]
         public void GetLatest_NoPageNumber_ReturnsTheImagesOfFirstPage()
         {
-            var webClientMock = CreateWebClientMock();
+            var webClientMock = CreateWebClientMock(includeDetailPageData: true);
             var webClientFactory = CreateWebClientFactory(webClientMock.Object);
             var client = new WallhavenClient(webClientFactory);
 
@@ -63,7 +63,7 @@ namespace Wallhaven.Client.Tests
         [Test]
         public void GetRandom_NoPageNumber_ReturnsTheImagesOfFirstPage()
         {
-            var webClientMock = CreateWebClientMock();
+            var webClientMock = CreateWebClientMock(includeDetailPageData: true);
             var webClientFactory = CreateWebClientFactory(webClientMock.Object);
             var client = new WallhavenClient(webClientFactory);
 
@@ -102,7 +102,7 @@ namespace Wallhaven.Client.Tests
         [Test]
         public void Search_SearchParams_ReturnsWallpaperInfos()
         {
-            var webClientMock = CreateWebClientMock();
+            var webClientMock = CreateWebClientMock(includeDetailPageData: true);
             var webClientFactory = CreateWebClientFactory(webClientMock.Object);
             var wallhavenClient = new WallhavenClient(webClientFactory);
             var searchParam = new SearchParameter
@@ -179,7 +179,7 @@ namespace Wallhaven.Client.Tests
             return webClientFactoryMock.Object;
         }
 
-        private Mock<IWebClient> CreateWebClientMock(Uri wallpaperListPageUri = null)
+        private Mock<IWebClient> CreateWebClientMock(Uri wallpaperListPageUri = null, bool includeDetailPageData = false)
         {
             var wallpaperListPageData = _resourceFile[WallpaperListPage];
             var wallpaperDetailPageData = _resourceFile[WallpaperDetailPage];
@@ -193,7 +193,8 @@ namespace Wallhaven.Client.Tests
                          .Setup(webClient => webClient.DownloadString(wallpaperListPageUri))
                          .Returns(wallpaperListPageData);
 
-            webClientMock.Setup(webClient => webClient.DownloadString(It.Is<Uri>(uri => uri.AbsolutePath.Contains("/wallpaper"))))
+            webClientMock.When(() => includeDetailPageData)
+                         .Setup(webClient => webClient.DownloadString(It.Is<Uri>(uri => uri.AbsolutePath.Contains("/wallpaper"))))
                          .Returns(wallpaperDetailPageData);
 
             return webClientMock;

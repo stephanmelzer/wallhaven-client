@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using AngleSharp.Dom;
 using AngleSharp.Parser.Html;
 using Wallhaven.Client.Net;
@@ -59,22 +56,8 @@ namespace Wallhaven.Client
             var dom = _htmlParser.Parse(result);
             var figureElements = dom.QuerySelectorAll("figure");
             var wallpaperInfos = CreateWallpaperInfoFromPage(figureElements);
-            AddSourceUri(wallpaperInfos);
 
             return wallpaperInfos;
-        }
-
-        private void AddSourceUri(List<WallpaperInfo> wallpaperInfos)
-        {
-            Parallel.ForEach(wallpaperInfos, wallpaperInfo =>
-            {
-                var webClient = _webClientFactory.CreateWebClient();
-                var result = webClient.DownloadString(new Uri(_baseUrl, $"wallpaper/{wallpaperInfo.Id}"));
-                var dom = _htmlParser.Parse(result);
-                var wallpaperElement = dom.QuerySelector("#wallpaper");
-                wallpaperInfo.Source = new Uri(_baseUrl, wallpaperElement.GetAttribute("src"));
-                wallpaperInfo.FileName = wallpaperInfo.Source.Segments.LastOrDefault();
-            });
         }
 
         private List<WallpaperInfo> CreateWallpaperInfoFromPage(IHtmlCollection<IElement> elements)
@@ -84,7 +67,7 @@ namespace Wallhaven.Client
 
         private WallpaperInfo CreateWallpaperInfoFromPage(IElement element)
         {
-            var wallpaperInfo = new WallpaperInfo
+            var wallpaperInfo = new WallpaperInfo(_webClientFactory)
             {
                 Id = int.Parse(element.GetAttribute("data-wallpaper-id")),
                 Resolution = element.QuerySelector(".wall-res").TextContent,
