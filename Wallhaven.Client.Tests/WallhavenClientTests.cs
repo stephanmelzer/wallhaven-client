@@ -11,7 +11,7 @@ using Wallhaven.Client.Search;
 namespace Wallhaven.Client.Tests
 {
     [TestFixture]
-    public class WallheavenClientTests
+    public class WallhavenClientTests
     {
         private Dictionary<string, string> _resourceFile = new Dictionary<string, string>();
         private const string WallpaperListPage = "Wallhaven.Client.Tests.TestData.WallpaperListPage.html";
